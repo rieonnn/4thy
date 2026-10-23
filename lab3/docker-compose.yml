@@ -1,0 +1,22 @@
+services:
+  scooter-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      PORT: ${PORT:-8000}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      APP_INITIAL_TIME: ${APP_INITIAL_TIME:-}
+      PRICE_PER_MINUTE: ${PRICE_PER_MINUTE:-5.00}
+      MINIMUM_COST: ${MINIMUM_COST:-50.00}
+      # В регламенте ставка паузы должна быть сниженной, но её сумма не задана.
+      PAUSE_PRICE_PER_MINUTE: ${PAUSE_PRICE_PER_MINUTE:-1.00}
+      ENABLE_TEST_CONTROLS: ${ENABLE_TEST_CONTROLS:-false}
+    ports:
+      - "${PORT:-8000}:${PORT:-8000}"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import os, urllib.request; urllib.request.urlopen('http://127.0.0.1:' + os.environ.get('PORT','8000') + '/health', timeout=2).read()\""]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
